@@ -1,0 +1,33 @@
+#!/bin/bash
+DATE=`date "+%m-%d-%Y_%H:%M"`
+DATE=$(echo "$DATE" | sed 's/://')
+SUDO="sudo -i";
+SHORT_SITENAME=$(ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 "hostname -s" | tr -d '\r' );
+free_disk_space=`ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 "df -h | grep ^/dev/mapper "`;
+free_disk=$( echo $free_disk_space | awk '{print $4}'| sed 's/.$//')
+javamem=`ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 " cat /bigmac/conf/node1.properties "`;
+Xmx=$( echo $javamem |  tr ' ' '\n' | grep ^-Xmx )
+heap=$(echo ${Xmx:4:2} | sed 's/^....//' | sed 's/.$//')
+let heap=heap+10
+
+if [[ ${free_disk} -gt ${heap} ]] ; then
+        echo "You have enought free disk space to run heapdump for $SHORT_SITENAME I will run heapdump on $SHORT_SITENAME"
+else
+        echo " I am not sure you have enough free disk space to run heapdump on $SHORT_SITENAME I will exit!!!"
+        exit 1;  
+fi
+
+active_container=`ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 "sudo bash /bigmac/container-setup/history.sh -n ACTIVE"`;
+active_container="${active_container%%[[:cntrl:]]}"
+java_procces=$(ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t ${1} " ${SUDO} /bigmac/container-setup/runInContainer.sh -c \"${active_container}\" -u bm -qqqq \" ps -ef | grep [D]java  \" || exit 1")
+jpid=$(echo "${java_procces}"| grep cpqServer | awk '{print $2}')
+
+ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t ${1} " ${SUDO} /bigmac/container-setup/runInContainer.sh -c \"${active_container}\" -u bm -qqqq \" /usr/java/latest/bin/jmap -dump:format=b,file=/bigmac/weblogic_logs/${SHORT_SITENAME}_${DATE}-heap $jpid  \" || exit 1"
+
+printf "Do yo want to restart site ${SHORT_SITENAME}: (y/n) \n";
+        read x ;
+	if [[ ${x} == 'y' ]]
+        	then
+                       bash site_restart.sh ${1}
+        fi
+

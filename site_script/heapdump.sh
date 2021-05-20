@@ -28,7 +28,11 @@ active_container="${active_container%%[[:cntrl:]]}"
 java_procces=$(ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t ${1} " ${SUDO} /bigmac/container-setup/runInContainer.sh -c \"${active_container}\" -u bm -qqqq \" ps -ef | grep [D]java  \" || exit 1")
 jpid=$(echo "${java_procces}"| grep cpqServer | awk '{print $2}')
 
-ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t ${1} " ${SUDO} /bigmac/container-setup/runInContainer.sh -c \"${active_container}\" -u bm -qqqq \" /usr/java/latest/bin/jmap -dump:format=b,file=/bigmac/weblogic_logs/${SHORT_SITENAME}_${DATE}-heap $jpid  \" || exit 1"
+ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t ${1} "
+		${SUDO} /bigmac/container-setup/runInContainer.sh -c \"${active_container}\" -u bm -qqqq \"
+		/usr/java/latest/bin/jmap -dump:format=b,file=/bigmac/weblogic_logs/${SHORT_SITENAME}_${DATE}-heap $jpid
+		\" || exit 1;
+" || exit 1;
 
 printf "Do you want to restart site ${SHORT_SITENAME}: (y/n) \n";
         read x ;

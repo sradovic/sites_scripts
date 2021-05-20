@@ -1,0 +1,4 @@
+##!/bin/bash
+bash backup_javalogs.sh $1
+ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 "sudo  systemctl restart rngd"
+ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 "sudo  /bigmac/bin/cpqctl restart"

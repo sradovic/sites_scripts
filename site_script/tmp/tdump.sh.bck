@@ -1,0 +1,17 @@
+##!/bin/bash
+N=$2
+D=$3
+DATE=`date "+%m-%d-%Y_%H:%M:%S"`
+SUDO="sudo -i";
+SHORT_SITENAME=$(ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 "hostname -s" | tr -d '\r' );
+active_container=`ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t $1 "sudo bash /bigmac/container-setup/history.sh -n ACTIVE"`;
+active_container="${active_container%%[[:cntrl:]]}"
+java_procces=$(ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t ${1} " ${SUDO} /bigmac/container-setup/runInContainer.sh -c \"${active_container}\" -u bm -qqqq \" ps -ef | grep [D]java  \" || exit 1")
+jpid=$(echo "${java_procces}"| grep cpqServer | awk '{print $2}')
+hname=$(ssh -t -t ${1} " ${SUDO} hostname | cut -d . -f 1")
+td_home=/bigmac/logs
+tstamp=`date +%d-%b-%Y`
+thdStamp=`date +%d-%b-%Y-%H`
+
+hname="${hname%%[[:cntrl:]]}"
+ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -t -t ${1} " ${SUDO} /bigmac/container-setup/runInContainer.sh -c \"${active_container}\" -u bm -qqqq \" for ((i = 1 ; i <= $N ; i++)); do  echo '.' ; /usr/java/latest/bin/jstack $jpid >> $td_home/${hname}-${thdStamp}-tdump.log; sleep $D; done  \" || exit 1"
