@@ -1,0 +1,3 @@
+cpq-s41-001.web.dem.ch3.bmi
+cpq-s51-001.web.dem.ch3.bmi
+cpq-t52-001.web.dem.ch3.bmi
