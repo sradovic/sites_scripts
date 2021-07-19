@@ -1,0 +1,80 @@
+#!/bin/bash
+bundel=$1   #bundel
+dockerimg=$2 # docker image
+SHOPTS="-o StrictHostKeyChecking=no -o PasswordAuthentication=no"
+version=$(echo "${bundel}" | cut -d'.' -f1-3)
+
+echo "$bastion"
+echo "$bundel"
+echo "$version"
+
+
+ssh  172.27.254.80 "cd /fsnhome/sradovic/transfer/; tar -zcvf - ./${bundel}" | ssh  172.27.34.215 "cd /fsnhome/sradovic/transfer/; tar -zxvf -"
+ssh  172.27.254.80 "cd /fsnhome/sradovic/transfer/; tar -zcvf - ./${bundel}" | ssh  172.30.41.185 "cd /fsnhome/sradovic/transfer/; tar -zxvf -"
+ssh  172.27.254.80 "cd /fsnhome/sradovic/transfer/; tar -zcvf - ./${bundel}" | ssh  172.30.34.211 "cd /fsnhome/sradovic/transfer/; tar -zxvf -"
+ssh  172.27.254.80 "cd /fsnhome/sradovic/transfer/; tar -zcvf - ./${dockerimg}" | ssh  172.30.41.185 "cd /fsnhome/sradovic/transfer/; tar -zxvf -"
+
+#ssh $SSHOPTS -t -t ${bastion} "cd /upgrade ; 
+#                        sudo mv  /fsnhome/sradovic/transfer/${bundel} ./ ;
+#                        sudo tar -xzvf ${bundel} ;
+#                        cd /upgrade/${version} ;
+#                        sudo ln -s /upgrade/upgrade_bundle/bundle/ components ;
+#						sudo mkdir runEnv tmp ;
+#						sudo chmod -R 777 runEnv tmp ;
+#"
+
+
+ssh $SSHOPTS -t -t 172.27.34.215 "cd /upgrade ;
+                                  sudo mv  /fsnhome/sradovic/transfer/${bundel} ./ ;
+                                  sudo tar -xzvf ${bundel} ;
+                                  cd /upgrade/${version} ;
+                                  sudo ln -s /upgrade/upgrade_bundle/bundle/ components ;
+                                  sudo mkdir runEnv tmp ;
+                                  sudo chmod -R 777 runEnv tmp ;
+
+"
+ssh $SSHOPTS -t -t 172.27.41.198  "cd /upgrade ;
+                                  sudo cp  /fsnhome/sradovic/transfer/${bundel} ./ ;
+                                  sudo tar -xzvf ${bundel} ;
+                                  cd /upgrade/${version} ;
+                                  sudo ln -s /upgrade/upgrade_bundle/bundle/ components ;
+                                  sudo mkdir runEnv tmp ;
+                                  sudo chmod -R 777 runEnv tmp ;
+
+"
+ssh $SSHOPTS -t -t 172.27.49.61   "cd /upgrade ;
+                                  sudo cp  /fsnhome/sradovic/transfer/${bundel} ./ ;
+                                  sudo tar -xzvf ${bundel} ;
+                                  cd /upgrade/${version} ;
+                                  sudo ln -s /upgrade/upgrade_bundle/bundle/ components ;
+                                  sudo mkdir runEnv tmp ;
+                                  sudo chmod -R 777 runEnv tmp ;
+
+"
+ssh $SSHOPTS -t -t 172.30.34.211 "cd /upgrade ;
+                                  sudo mv  /fsnhome/sradovic/transfer/${bundel} ./ ;
+                                  sudo tar -xzvf ${bundel} ;
+                                  cd /upgrade/${version} ;
+                                  sudo ln -s /upgrade/upgrade_bundle/bundle/ components ;
+                                  sudo mkdir runEnv tmp ;
+                                  sudo chmod -R 777 runEnv tmp ;
+
+"
+ssh $SSHOPTS -t -t 172.30.41.185  "cd /upgrade ;
+                                  sudo cp  /fsnhome/sradovic/transfer/${bundel} ./ ;
+                                  sudo tar -xzvf ${bundel} ;
+                                  cd /upgrade/${version} ;
+                                  sudo ln -s /upgrade/upgrade_bundle/bundle/ components ;
+                                  sudo mkdir runEnv tmp ;
+                                  sudo chmod -R 777 runEnv tmp ;
+
+"
+ssh $SSHOPTS -t -t 172.30.48.11   "cd /upgrade ;
+                                  sudo cp  /fsnhome/sradovic/transfer/${bundel} ./ ;
+                                  sudo tar -xzvf ${bundel} ;
+                                  cd /upgrade/${version} ;
+                                  sudo ln -s /upgrade/upgrade_bundle/bundle/ components ;
+                                  sudo mkdir runEnv tmp ;
+                                  sudo chmod -R 777 runEnv tmp ;
+
+"
